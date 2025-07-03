@@ -1,0 +1,34 @@
+{
+  "port": 8080,
+  "cacheTime": 5,
+
+  "database": {
+    "host": "",
+    "user": "",
+    "password": "",
+    "appName": ""
+  },
+  "development": {
+    "publicIP": ""
+  },
+  "news-apis": [
+    "host": "newsapi.org",
+    "port": 443,
+    "path": "/v2/top-headlines?country=us&apiKey=???",
+    "method": "GET",
+    "headers": { "User-Agent": "" }
+  ],
+  "api": {
+    "logging" : {
+      "console": ["DEBUG", "WARN", "INFO", "ERROR"],
+      "file": ["DEBUG", "WARN", "INFO", "ERROR"]
+    },
+    "audit": true,
+    "endpointsExemptFromApiKey": ["/auth/register", "/auth/login"]
+  },
+  "scopes": {
+    "basic": [
+      "/auth/refresh_key", "/auth/logout", "/news/dashboard", "/track", "/ping"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+# Ignore everything in logs and its subdirectories
+/logs/*
+/logs/audit/*
+
+# Allow the audit directory itself
+!/logs/audit/
+
+# Allow .gitkeep files
+!/logs/.gitkeep
+!/logs/audit/.gitkeep
+
+# Ignore a specific config file
+settings/configs/RestAPI.json
+
+# Common ignores
+node_modules/
+build/
+npm-debug.log
+.idea/
+.env
+.DS_Store
