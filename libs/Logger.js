@@ -9,21 +9,25 @@ const RestAPI = JSON.parse(
 
 class Logger {
 
-    logger;
-    consoleLogType = [];
-    fileLogType = [];
+    #logger;
+    #consoleLogType = [];
+    #fileLogType = [];
 
     constructor() {
-        this.#getFormattedDate().then(date => {
-          this.logger = fs.createWriteStream('logs/log-' + date + '.txt', {
-              flags: 'a'
-          });
-        });
-        RestAPI.api.logging.console.forEach((item, i) => {
-          this.consoleLogType.push(LogType[item]);
-        });
-        RestAPI.api.logging.file.forEach((item, i) => {
-          this.fileLogType.push(LogType[item]);
+        this.#consoleLogType = [];
+        this.#fileLogType = [];
+        this.#logger = null;
+
+        const { console: consoleLog, file: fileLog } = RestAPI.api.logging;
+
+        this.consoleLogType = consoleLog.map(item => LogType[item]);
+        this.fileLogType = fileLog.map(item => LogType[item]);
+    }
+
+    async init() {
+        const date = await this.#getFormattedDate();
+        this.#logger = fs.createWriteStream(`logs/log-${date}.txt`, {
+            flags: 'a'
         });
     }
 
@@ -45,11 +49,11 @@ class Logger {
 
     #log(type, message) {
       this.#getFormattedDateTime().then(date => {
-        if(this.#shouldLog(type, this.consoleLogType)) {
+        if(this.#shouldLog(type, this.#consoleLogType)) {
           console.log('[' + date + '] [ ' + this.#getPrefix(type, true) + ' ]:\x1b[37m ' + message + '\x1b[0m');
         }
-        if(this.#shouldLog(type, this.fileLogType)) {
-          this.logger.write('[ ' + this.#getPrefix(type, false) + ' ] [' + date + ']: ' + message + '\n');
+        if(this.#shouldLog(type, this.#fileLogType)) {
+          this.#logger.write('[ ' + this.#getPrefix(type, false) + ' ] [' + date + ']: ' + message + '\n');
         }
       });
     }

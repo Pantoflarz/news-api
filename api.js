@@ -87,8 +87,9 @@ const downloadNews = () => {
 
 const setup = async () => {
 
+  await logger.init();
   await connect(RestAPI.database);
-  await downloadNews();
+  //await downloadNews();
 
   try {
     logger.debug('Initialising cache... ');

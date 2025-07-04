@@ -54,6 +54,7 @@ async function Audit(req, res) {
     }
 
     const helper = new AuditLogger();
+    await helper.init();
 
     if (req.path.includes("/auth")) {
       helper.log("AUTHENTICATION", status, requestObj, responseObj);

@@ -17,9 +17,7 @@ Run using `npm start`.
 Run the tests using `npm test`.
 
 ## Coming Soon
-* Update logging to handle all errors (including from try catch blocks).
 * Tests for all existing endpoints.
-* Improve validation of inputs.
 * Support for multiple news sources.
 * Recommendation algorithm to personalise returned news for a given account.
-* Code tidy-ups (split into MVC, tidy up promises and logging).
+* Code tidy-ups (logging to include all try catch blocks, user input validation, mongodb query validation).

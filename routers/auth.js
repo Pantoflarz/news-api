@@ -1,14 +1,20 @@
 const express = require('express');
+const asyncHandler = require('express-async-handler');
+const bcrypt = require('bcrypt');
+const responseJson = require('../libs/Response.js');
+
+const AuthController = require('../controllers/authController.js');
+
 const auth = express.Router();
 
-const auth_controller = require("../controllers/authController.js");
+const authController = new AuthController(bcrypt, responseJson);
 
-auth.post('/register', auth_controller.auth_register_post);
+auth.post('/register', asyncHandler(authController.register_post.bind(authController)));
 
-auth.post('/login', auth_controller.auth_login_post);
+auth.post('/login', asyncHandler(authController.login_post.bind(authController)));
 
-auth.post('/refresh_key', auth_controller.auth_refresh_key_post);
+auth.post('/refresh_key', asyncHandler(authController.refresh_key_post.bind(authController)));
 
-auth.post('/logout', auth_controller.auth_logout_post);
+auth.post('/logout', asyncHandler(authController.logout_post.bind(authController)));
 
 module.exports = auth;

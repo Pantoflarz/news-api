@@ -1,8 +1,13 @@
-const { Router } = require('express');
-const news = Router();
+const express = require('express');
+const asyncHandler = require("express-async-handler");
+const responseJson = require('../libs/Response.js');
 
-const news_controller = require("../controllers/newsController.js");
+const NewsController = require("../controllers/newsController.js");
 
-news.get('/dashboard', news_controller.news_dashboard_get);
+const news = express.Router();
+
+const newsController = new NewsController(responseJson);
+
+news.get('/dashboard', asyncHandler(newsController.dashboard_get.bind(newsController)));
 
 module.exports = news;

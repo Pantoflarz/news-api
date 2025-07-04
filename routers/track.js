@@ -1,8 +1,13 @@
-const { Router } = require('express');
-const track = Router();
+const express = require('express');
+const asyncHandler = require("express-async-handler");
+const responseJson = require('../libs/Response.js');
 
-const track_controller = require("../controllers/trackController.js");
+const TrackController = require("../controllers/trackController.js");
 
-track.post('/track', track_controller.track_track_post);
+const track = express.Router();
+
+const trackController = new TrackController(responseJson);
+
+track.post('/track', asyncHandler(pingController.track_post.bind(pingController)));
 
 module.exports = track;

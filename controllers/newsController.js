@@ -1,14 +1,18 @@
 const asyncHandler = require("express-async-handler");
 
-(async () => {
-  const responseModule = await import('../libs/Response.js');
-  responseJson = responseModule.default;
-})();
+class NewsController {
 
-exports.news_dashboard_get = asyncHandler(async (req, res, next) => {
+  constructor(responseJson) {
+    this.responseJson = responseJson;
+  }
 
-  res.status(200).send(responseJson("OK", res.locals.cache.get("news")));
+  async dashboard_get(req, res, next) {
 
-  next();
+    res.status(200).send(this.responseJson("OK", res.locals.cache.get("news")));
 
-});
+    next();
+
+  }
+}
+
+module.exports = NewsController;

@@ -1,14 +1,18 @@
 const asyncHandler = require("express-async-handler");
 
-(async () => {
-  const responseModule = await import('../libs/Response.js');
-  responseJson = responseModule.default;
-})();
+class PingController {
 
-exports.ping_get = asyncHandler(async (req, res, next) => {
+  constructor(responseJson) {
+    this.responseJson = responseJson;
+  }
 
-  res.send(responseJson("pong"));
+  ping_get(req, res, next) {
 
-  next();
+    res.send(this.responseJson("pong"));
 
-});
+    next();
+
+  }
+}
+
+module.exports = PingController;
