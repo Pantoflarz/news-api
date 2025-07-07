@@ -43,7 +43,7 @@ async function Audit(req, res) {
     let requestObj = {
       action: req.method,
       path: req.path,
-      actor: res.locals.userId,
+      actor: req.userId,
       timestamp: new Date(Date.now()),
       source: ip,
       metadata: req.query

@@ -11,7 +11,7 @@ class AuthController {
   }
 
   async register_post(req, res, next) {
-    let useremail = req.body.email.trim();
+    let useremail = req.body.email;
     let username = req.body.username;
     let password = await this.bcrypt.hash(req.body.password, 10);
     let registeredDate = new Date();
@@ -31,7 +31,7 @@ class AuthController {
   }
 
 async login_post(req, res, next) {
-    let login = req.body.username.trim();
+    let login = req.body.login;
     let password = req.body.password;
 
     const result = await User.findOne(
@@ -43,63 +43,45 @@ async login_post(req, res, next) {
     });
 
     if (result != null) {
-        if(await this.bcrypt.compare(password, result.password)){
-            let token = crypto.randomUUID();
-            let refreshToken = crypto.randomUUID();
-            let expires = new Date(Date.now() + 1 * (24 * 60 * 1000));
+      if (await this.bcrypt.compare(password, result.password)) {
+        let token = crypto.randomUUID();
+        let refreshToken = crypto.randomUUID();
+        let expires = new Date(Date.now() + 1 * (24 * 60 * 1000));
 
-            const insert = await Token.insertOne({userId: result._id, token: token, refreshToken: refreshToken, expires: expires });
+        const insert = await Token.insertOne({userId: result._id, token: token, refreshToken: refreshToken, expires: expires });
 
-            if (insert) {
-                res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
-            } else {
-                res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
-            }
-        } else {
-            res.status(403).send(this.responseJson("error", "Provided details invalid."));
+        if (insert) {
+            res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
         }
-    } else {
-        res.status(403).send(this.responseJson("error", "Provided details invalid."));
+      }
     }
+
+    res.status(403).send(this.responseJson("error", "Provided details invalid."));
 
     next();
   }
 
 async refresh_key_post(req, res, next) {
-    let token = req.query.api_key;
-    let refreshToken = req.query.refresh_key;
 
-    const result = await Token.findOne(
-    {
-        $and: [
-          {token: token},
-          {refreshToken: refreshToken}
-        ]
-    });
+    let newToken = crypto.randomUUID();
+    let newRefreshToken = crypto.randomUUID();
 
-    if (result != null) {
-        let newToken = crypto.randomUUID();
-        let newRefreshToken = crypto.randomUUID();
+    let expires = new Date(Date.now() + 24 * (60 * 60 * 1000)).toISOString()
 
-        let expires = new Date(Date.now() + 24 * (60 * 60 * 1000)).toISOString()
+    const insert = await Token.insertOne({userId: req.userId, token: newToken, refreshToken: newRefreshToken, expires: expires });
 
-        const insert = await Token.insertOne({userId: result._id, token: newToken, refreshToken: newRefreshToken, expires: expires });
-
-        if (insert) {
-            res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
-            Token.deleteOne({"token": token});
-        } else {
-            res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
-        }
+    if (insert) {
+        await Token.deleteOne({token: req.apiKey});
+        res.status(200).send(this.responseJson("OK", {"token": newToken, "refreshToken": newRefreshToken}));
     } else {
-        res.status(403).send(this.responseJson("error", "Provided details invalid."));
+        res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
     }
 
     next();
   }
 
 async logout_post(req, res, next) {
-    let token = req.query.api_key;
+    let token = req.apiKey;
 
     await Token.deleteOne({token: token});
 

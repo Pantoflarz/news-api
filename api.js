@@ -8,17 +8,20 @@ const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
 
-const Audit = require('./postprocessors/Audit');
-const Authentication = require('./middleware/Authentication');
-const { connect } = require('./libs/MongoDB');
-const Logger = require('./libs/Logger');
-const responseJson = require('./libs/Response');
+const Audit = require('./postprocessors/Audit.js');
+//const validateApiKey = require('./middleware/validateApiKey.js');
+const { apiKeyValidator } = require('./validators/apiKeyValidator.js');
+const validateRequest = require('./middleware/validateRequest.js');
+const { connect } = require('./libs/MongoDB.js');
+const Logger = require('./libs/Logger.js');
+const responseJson = require('./libs/Response.js');
 
-const Article = require('./models/Article');
+const Article = require('./models/Article.js');
 
-const auth = require('./routers/auth');
-const news = require('./routers/news');
-const ping = require('./routers/ping');
+const auth = require('./routers/auth.js');
+const news = require('./routers/news.js');
+const ping = require('./routers/ping.js');
+const track = require('./routers/track.js');
 
 const logger = new Logger();
 
@@ -134,11 +137,12 @@ const setup = async () => {
     next();
   });
 
-  web.use(Authentication());
+  web.use(apiKeyValidator, validateRequest);
 
-  web.use('/auth', auth);
-  web.use('/news', news);
-  web.use('/ping', ping);
+  web.use(auth);
+  web.use(news);
+  web.use(ping);
+  web.use(track);
 
   web.use(async function (req, res, next) {
     if (!res.headersSent) {
@@ -157,8 +161,11 @@ const setup = async () => {
 
   web.use((err, req, res, next) => {
     logger.error(err.stack);
-    res.status(500).send(responseJson("error", "Server error."));
-    next(err);
+
+    if (!res.headersSent) {
+      res.status(500).send(responseJson("error", "Server error."));
+  }
+
   });
 
   logger.debug('...started');

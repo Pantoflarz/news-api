@@ -17,7 +17,11 @@ Run using `npm start`.
 Run the tests using `npm test`.
 
 ## Coming Soon
+* Finish all js docs.
+* Checking validity of token expiration dates.
+* Unit tests.
+* Logging (debug, info, warning, error) inside controllers to enable better debugging and tracking of requests).
 * Tests for all existing endpoints.
-* Support for multiple news sources.
+* Tidy up Audit Logging - make sure data logged is not sensitive.
 * Recommendation algorithm to personalise returned news for a given account.
-* Code tidy-ups (logging to include all try catch blocks, user input validation, mongodb query validation).
+* Code tidy-ups (logging to include all try catch blocks, mongodb query validation).

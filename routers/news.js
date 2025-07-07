@@ -8,6 +8,6 @@ const news = express.Router();
 
 const newsController = new NewsController(responseJson);
 
-news.get('/dashboard', asyncHandler(newsController.dashboard_get.bind(newsController)));
+news.get('/news/dashboard', asyncHandler(newsController.dashboard_get.bind(newsController)));
 
 module.exports = news;

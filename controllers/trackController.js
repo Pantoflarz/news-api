@@ -10,10 +10,9 @@ class TrackController {
 
   async track_post(req, res, next) {
 
-    let token = req.query.token;
     let articleID = req.body.articleID;
 
-    const insert = await Track.insertOne({userId: res.locals.userId, article: articleID, time: new Date(Date.now())});
+    const insert = await Track.insertOne({userId: req.userId, article: articleID, time: new Date(Date.now())});
     if (insert) {
         res.status(200).send(this.responseJson("OK", "success"));
     } else {
