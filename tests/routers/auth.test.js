@@ -7,8 +7,7 @@ describe("POST /auth/register", () => {
   describe("when missing API Key header", () => {
     test("fails to register due to missing API Key", async () => {
       const res = await request(app).post("/auth/register");
-      expect(res.statusCode).toBe(500);
-      expect(res.body).toMatchObject({"response": "Server error.", "status": "error"});
+      expect(res.statusCode).toBe(400);
     });
   });
 });

@@ -8,6 +8,12 @@ const ping = express.Router();
 
 const pingController = new PingController(responseJson);
 
+/**
+ * @route   GET /ping
+ * @desc    Check alive endpoint for the API
+ * @access  Protected - Requires API key
+ * @returns {200} { "status": "OK", "response": "pong" }
+ */
 ping.get('/ping', asyncHandler(pingController.ping_get.bind(pingController)));
 
 module.exports = ping;

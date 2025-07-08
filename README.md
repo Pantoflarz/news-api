@@ -18,7 +18,6 @@ Run the tests using `npm test`.
 
 ## Coming Soon
 * Finish all js docs.
-* Checking validity of token expiration dates.
 * Unit tests.
 * Logging (debug, info, warning, error) inside controllers to enable better debugging and tracking of requests).
 * Tests for all existing endpoints.

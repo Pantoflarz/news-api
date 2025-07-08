@@ -46,9 +46,9 @@ async login_post(req, res, next) {
       if (await this.bcrypt.compare(password, result.password)) {
         let token = crypto.randomUUID();
         let refreshToken = crypto.randomUUID();
-        let expires = new Date(Date.now() + 1 * (24 * 60 * 1000));
+        let expires = new Date(Date.now() + 12 * (24 * 60 * 1000));
 
-        const insert = await Token.insertOne({userId: result._id, token: token, refreshToken: refreshToken, expires: expires });
+        const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
 
         if (insert) {
             res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
@@ -66,9 +66,9 @@ async refresh_key_post(req, res, next) {
     let newToken = crypto.randomUUID();
     let newRefreshToken = crypto.randomUUID();
 
-    let expires = new Date(Date.now() + 24 * (60 * 60 * 1000)).toISOString()
+    let expires = new Date(Date.now() + 12 * (60 * 60 * 1000)).toISOString()
 
-    const insert = await Token.insertOne({userId: req.userId, token: newToken, refreshToken: newRefreshToken, expires: expires });
+    const insert = await Token.insertOne({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
 
     if (insert) {
         await Token.deleteOne({token: req.apiKey});

@@ -10,35 +10,27 @@ const RestAPI = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../settings/configs/RestAPI.json'), 'utf8')
 );
 
-exports.refreshKeyValidator = [
+exports.refreshedKeyValidator = [
   header('x-rest-api-refresh-key').custom(async (_, { req }) => {
 
-    if(RestAPI.api.endpointsExemptFromApiKey.includes(req.path)) return true;
+    const apiKey = req.get('x-rest-api-refresh-key');
 
-    const hasRefreshKeyHeader = Boolean(req.headers['x-rest-api-refresh-key']);
-
-    if (!hasRefreshKeyHeader) {
+    //check header exists
+    if (!Boolean(apiKey)) {
       throw new Error('No x-rest-api-refresh-key header found in request.');
     }
 
-    const refreshKey = req.headers['x-rest-api-refresh-key'];
-
     // Validate UUID
-    if (!validator.isUUID(refreshKey, 4)) {
+    if (!validator.isUUID(apiKey, 4)) {
       throw new Error('x-rest-api-refresh-key provided is not in the expected format.');
     }
 
-    // Store normalized key for use in controller
-    req.refreshKey = refreshKey;
+    const result = await Token.findOne({ refreshToken: apiKey, expires: { $gt: new Date() }});
 
-    if (req.apiKey !== undefined) {
-        const result = await Token.findOne({ refreshToken: req.refreshKey});
-        if (result != null) {
-          return true;
-        } else {
-          throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
-      }
+    if (result !== null) {
+      return true;
+    } else {
+      throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
     }
-
   }),
 ];
