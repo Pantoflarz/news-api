@@ -9,7 +9,8 @@ An example News API that handles basic authentication, account management, news 
 * A MongoDB database (for testing purposes, https://cloud.mongodb.com/ is an example of where you can set one up for free)
 
 ## Usage
-See the `RestAPI.example.json` file for an example config. Fill it in and rename it to RestAPI.json to use it.
+See the `settings/configs/RestAPI.example.json` file for an example application config. Fill it in/amend it and rename it to RestAPI.json to use it.
+See the `.env.example` file for an example secrets config. Fill it in/amend it and rename it to .env to use it.
 
 Install using `npm ci ./path/to/news-api`.
 

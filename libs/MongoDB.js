@@ -7,7 +7,7 @@ async function connect(config, options = {}) {
 
   try {
     await mongoose.connect(
-      `mongodb+srv://${config.user}:${config.password}@${config.host}/app?retryWrites=true&w=majority&appName=Broaden`,
+      `mongodb+srv://${config.user}:${config.password}@${config.host}/app?retryWrites=true&w=majority&appName=${config.dbName}`,
       { ...options }
     );
     isConnected = true;

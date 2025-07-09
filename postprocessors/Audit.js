@@ -1,11 +1,9 @@
+require('dotenv').config();
+
 const AuditLogger = require('../libs/AuditLogger');
 
 const fs = require('fs');
 const path = require('path');
-
-const RestAPI = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../settings/configs/RestAPI.json'), 'utf8')
-);
 
 async function Audit(req, res) {
 
@@ -37,7 +35,7 @@ async function Audit(req, res) {
     }
 
     if (ip === "1" || ip === "127.0.0.1") {
-        ip = RestAPI.development.publicIP;
+        ip = process.env.DEVELOPMENT_PUBLIC_IP;
     }
 
     let requestObj = {

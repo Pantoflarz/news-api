@@ -10,7 +10,7 @@ const RestAPI = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../settings/configs/RestAPI.json'), 'utf8')
 );
 
-exports.refreshedKeyValidator = [
+exports.refreshKeyValidator = [
   header('x-rest-api-refresh-key').custom(async (_, { req }) => {
 
     const apiKey = req.get('x-rest-api-refresh-key');
@@ -32,5 +32,5 @@ exports.refreshedKeyValidator = [
     } else {
       throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
     }
-  }),
+  })
 ];

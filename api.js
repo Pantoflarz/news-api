@@ -8,8 +8,9 @@ const NodeCache = require('node-cache');
 const fs = require('fs');
 const path = require('path');
 
+require('dotenv').config();
+
 const Audit = require('./postprocessors/Audit.js');
-//const validateApiKey = require('./middleware/validateApiKey.js');
 const { apiKeyValidator } = require('./validators/apiKeyValidator.js');
 const validateRequest = require('./middleware/validateRequest.js');
 const { connect } = require('./libs/MongoDB.js');
@@ -41,11 +42,11 @@ const downloadNews = () => {
   return new Promise((resolve, reject) => {
 
     const options = {
-      host: RestAPI.newsapi.host,
-      port: RestAPI.newsapi.port,
-      path: RestAPI.newsapi.path,
-      method: RestAPI.newsapi.method,
-      headers: RestAPI.newsapi.headers
+      host: process.env.NEWSAPI_HOST,
+      port: process.env.NEWSAPI_PORT,
+      path: process.env.NEWSAPI_PATH,
+      method: process.env.NEWSAPI_METHOD,
+      headers: JSON.parse(process.env.NEWSAPI_HEADERS)
     };
 
     https.get(options, (res) => {
@@ -91,7 +92,12 @@ const downloadNews = () => {
 const setup = async () => {
 
   await logger.init();
-  await connect(RestAPI.database);
+  await connect({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    dbName: process.env.DB_NAME
+  });
   //await downloadNews();
 
   try {

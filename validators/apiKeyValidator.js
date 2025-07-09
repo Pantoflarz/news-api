@@ -40,5 +40,5 @@ exports.apiKeyValidator = [
     } else {
       throw new Error('Invalid/expired x-rest-api-key provided in request.');
     }
-  }),
+  })
 ];
