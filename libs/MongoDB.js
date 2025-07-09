@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+const getLogger = require('../utils/Logger.js');
+const logger = getLogger('MongoDB');
+
 let isConnected = false;
 
 async function connect(config, options = {}) {
@@ -11,15 +14,15 @@ async function connect(config, options = {}) {
       { ...options }
     );
     isConnected = true;
-    console.log('✅ MongoDB connection successful');
+    logger.info('✅ MongoDB connection successful');
     return mongoose;
   } catch (err) {
-    console.error('❌ MongoDB connection failed:', err.message);
-    throw err; // rethrow if you want calling code to handle it
+    logger.error('❌ MongoDB connection failed:', err.message);
+    throw err;
   }
 }
 
 module.exports = {
   connect,
-  mongoose, // optionally expose for advanced use
+  mongoose
 };

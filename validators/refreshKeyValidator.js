@@ -1,14 +1,7 @@
 const { header } = require('express-validator');
 const validator = require('validator');
 
-const fs = require('fs');
-const path = require('path');
-
 const Token = require('../models/Token.js');
-
-const RestAPI = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../settings/configs/RestAPI.json'), 'utf8')
-);
 
 exports.refreshKeyValidator = [
   header('x-rest-api-refresh-key').custom(async (_, { req }) => {

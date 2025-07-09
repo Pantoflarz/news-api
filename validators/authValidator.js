@@ -2,12 +2,12 @@ const { body } = require('express-validator');
 
 exports.registerPostValidation = [
 
-  body('username')
+  body('name')
     .trim()
     .toLowerCase()
-    .notEmpty().withMessage('Username is required')
-    .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3-16 characters')
-    .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username can only contain letters, numbers, and underscores')
+    .notEmpty().withMessage('Name is required')
+    .isLength({ min: 3, max: 32 }).withMessage('Name must be between 3-32 characters')
+    .matches(/^[a-zA-Z]+$/).withMessage('Name can only contain letters')
     .escape(),
 
   body('email')
@@ -27,11 +27,11 @@ exports.registerPostValidation = [
 
 exports.loginPostValidation = [
 
-  body('login')
+  body('email')
     .trim()
-    .notEmpty().withMessage('Login is required')
-    .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3-16 characters')
-    .escape(),
+    .normalizeEmail()
+    .isEmail()
+    .withMessage('Invalid email address'),
 
   body('password')
     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')

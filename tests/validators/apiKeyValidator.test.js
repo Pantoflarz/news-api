@@ -26,7 +26,7 @@ describe('apiKeyValidator validator', () => {
     const result = await runValidator(apiKeyValidator, req);
 
     expect(result.isEmpty()).toBe(false);
-    expect(result.array()[0].msg).toMatch(/No x-rest-api-key/);
+    expect(result.array()[0].msg).toMatch("No x-rest-api-key header found in request.");
   });
 
   test('fails if x-rest-api-key is not a valid UUIDv4', async () => {
@@ -35,7 +35,7 @@ describe('apiKeyValidator validator', () => {
     const result = await runValidator(apiKeyValidator, req);
 
     expect(result.isEmpty()).toBe(false);
-    expect(result.array()[0].msg).toMatch(/not in the expected format/);
+    expect(result.array()[0].msg).toBe("x-rest-api-key provided is not in the expected format.");
   });
 
   test('fails if token is not found or expired in DB', async () => {
@@ -46,7 +46,7 @@ describe('apiKeyValidator validator', () => {
     const result = await runValidator(apiKeyValidator, req);
 
     expect(result.isEmpty()).toBe(false);
-    expect(result.array()[0].msg).toMatch(/Invalid\/expired/);
+    expect(result.array()[0].msg).toMatch("Invalid/expired x-rest-api-key provided in request.");
   });
 });
 

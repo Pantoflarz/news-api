@@ -2,9 +2,6 @@ require('dotenv').config();
 
 const AuditLogger = require('../libs/AuditLogger');
 
-const fs = require('fs');
-const path = require('path');
-
 async function Audit(req, res) {
 
     //event = access, authentication, modification

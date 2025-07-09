@@ -6,7 +6,7 @@ exports.trackPostValidation = [
   body('articleID')
   .trim()
   .toLowerCase()
-  .notEmpty().withMessage('Article ID is required')
+  .notEmpty().withMessage('articleID is required')
   .escape()
   .custom(async (value, { req }) => {
 

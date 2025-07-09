@@ -3,6 +3,9 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/User.js");
 const Token = require('../models/Token.js');
 
+const getLogger = require('../utils/Logger.js');
+const logger = getLogger('AuthController');
+
 class AuthController {
 
   constructor(bcrypt, responseJson) {
@@ -19,10 +22,17 @@ class AuthController {
     const result = await User.findOne({ userEmail: useremail});
 
     if (result == null) {
+      try {
         const insert = await User.create({userEmail: useremail, userName: username, password: password, registeredDate: registeredDate});
         if (insert) {
-            res.status(200).send(this.responseJson("OK", "success"));
+          res.status(200).send(this.responseJson("OK", "success"));
         }
+      } catch (err) {
+        logger.error('Failed to create user', {
+          error: err.message,
+          stack: err.stack
+        });
+      }
     }
 
     res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
@@ -48,10 +58,17 @@ async login_post(req, res, next) {
         let refreshToken = crypto.randomUUID();
         let expires = new Date(Date.now() + 12 * (24 * 60 * 1000));
 
-        const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
+        try {
+          const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
 
-        if (insert) {
-            res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
+          if (insert) {
+              res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
+          }
+        } catch (err) {
+          logger.error('Failed to create token for user', {
+            error: err.message,
+            stack: err.stack
+          });
         }
       }
     }
@@ -68,13 +85,20 @@ async refresh_key_post(req, res, next) {
 
     let expires = new Date(Date.now() + 12 * (60 * 60 * 1000)).toISOString()
 
-    const insert = await Token.insertOne({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
+    try{
+      const insert = await Token.insertOne({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
 
-    if (insert) {
-        await Token.deleteOne({token: req.apiKey});
-        res.status(200).send(this.responseJson("OK", {"token": newToken, "refreshToken": newRefreshToken}));
-    } else {
-        res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
+      if (insert) {
+          await Token.deleteOne({token: req.apiKey});
+          res.status(200).send(this.responseJson("OK", {"token": newToken, "refreshToken": newRefreshToken}));
+      } else {
+          res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
+      }
+    } catch (err) {
+      logger.error('Failed to refresh token for user', {
+        error: err.message,
+        stack: err.stack
+      });
     }
 
     next();

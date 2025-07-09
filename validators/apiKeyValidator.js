@@ -1,20 +1,15 @@
 const { header } = require('express-validator');
 const validator = require('validator');
 
-const fs = require('fs');
-const path = require('path');
-
 const Token = require('../models/Token.js');
 
-const RestAPI = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../settings/configs/RestAPI.json'), 'utf8')
-);
+const Config = require('../settings/configs/ConfigLoader.js');
 
 exports.apiKeyValidator = [
   header('x-rest-api-key').custom(async (_, { req }) => {
 
     //return early if the endpoint is exempt from api key verification
-    if(RestAPI.api.endpointsExemptFromApiKey.includes(req.path)) return true;
+    if(Config.apiConfig.endpointsExemptFromApiKey.includes(req.path)) return true;
 
     const apiKey = req.get('x-rest-api-key');
 
@@ -30,7 +25,7 @@ exports.apiKeyValidator = [
 
     const result = await Token.findOne({ token: apiKey, expires: { $gt: new Date() }});
 
-    if (result?.scope && RestAPI.scopes[result.scope] && RestAPI.scopes[result.scope].includes(req.path)) {
+    if (result?.scope && Config.scopes[result.scope] && Config.scopes[result.scope].includes(req.path)) {
       req.userId = result.userId;
 
       // Store normalized key for use in controller

@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const https = require('https');
 const express = require('express');
 const helmet = require('helmet');
@@ -5,16 +7,11 @@ const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const userAgent = require('express-useragent');
 const NodeCache = require('node-cache');
-const fs = require('fs');
-const path = require('path');
-
-require('dotenv').config();
 
 const Audit = require('./postprocessors/Audit.js');
 const { apiKeyValidator } = require('./validators/apiKeyValidator.js');
 const validateRequest = require('./middleware/validateRequest.js');
 const { connect } = require('./libs/MongoDB.js');
-const Logger = require('./libs/Logger.js');
 const responseJson = require('./libs/Response.js');
 
 const Article = require('./models/Article.js');
@@ -24,11 +21,10 @@ const news = require('./routers/news.js');
 const ping = require('./routers/ping.js');
 const track = require('./routers/track.js');
 
-const logger = new Logger();
+const getLogger = require('./utils/Logger.js');
+const logger = getLogger('api.js');
 
-const RestAPI = JSON.parse(
-  fs.readFileSync(path.join(__dirname, './settings/configs/RestAPI.json'), 'utf8')
-);
+const Config = require('./settings/configs/ConfigLoader.js');
 
 const limiter = rateLimit({
 	windowMs: 10 * 60 * 1000, // 10 minutes
@@ -91,7 +87,6 @@ const downloadNews = () => {
 
 const setup = async () => {
 
-  await logger.init();
   await connect({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -158,7 +153,7 @@ const setup = async () => {
   });
 
   web.use(function (req, res, next) {
-    if (!RestAPI.api.audit) return next();
+    if (!Config.apiConfig.audit) return next();
     if (res.headersSent) {
       Audit(req, res);
     }
