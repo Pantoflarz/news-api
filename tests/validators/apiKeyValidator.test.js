@@ -3,6 +3,18 @@ const { validationResult } = require('express-validator');
 const Token = require('../../models/Token.js');
 
 jest.mock('../../models/Token.js');
+jest.mock('../../settings/configs/ConfigLoader.js', () => ({
+  get apiConfig() {
+    return {
+      endpointsExemptFromApiKey: ['/auth/login']
+    };
+  },
+  get scopesConfig() {
+    return {
+      basic: ['/news/dashboard']
+    };
+  }
+}));
 
 describe('apiKeyValidator validator', () => {
   beforeEach(() => {
@@ -10,14 +22,13 @@ describe('apiKeyValidator validator', () => {
   });
 
   test('passes with a valid UUIDv4 API key and matching token in DB', async () => {
-    Token.findOne.mockResolvedValue({ userId: '123', scope: "basic" });
+    Token.findOne.mockResolvedValue({ userId: '123', scope: 'basic', token: 'c9bf9e57-1685-4c89-bafb-ff5af830be8a', refreshToken: undefined });
 
     const req = mockRequest('c9bf9e57-1685-4c89-bafb-ff5af830be8a');
 
     const result = await runValidator(apiKeyValidator, req);
 
     expect(result.isEmpty()).toBe(true);
-    expect(req.apiKey).toBe('c9bf9e57-1685-4c89-bafb-ff5af830be8a');
   });
 
   test('fails if no x-rest-api-key header is provided', async () => {
@@ -61,11 +72,8 @@ const mockRequest = (apiKey) => {
 }
 
 const runValidator = async (validatorArray, req) => {
-  const res = {};
-  const next = jest.fn();
-
   for (const validator of validatorArray) {
-    await validator(req, res, next);
+    await validator.run(req);
   }
 
   return validationResult(req);

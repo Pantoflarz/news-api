@@ -10,8 +10,6 @@ class PingController {
 
     res.send(this.responseJson("pong"));
 
-    next();
-
   }
 }
 

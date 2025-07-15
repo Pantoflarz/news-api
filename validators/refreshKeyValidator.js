@@ -3,27 +3,31 @@ const validator = require('validator');
 
 const Token = require('../models/Token.js');
 
+const { isKeyInValidFormat } = require('../utils/keyFormat.js');
+const { verifyRefreshKey } = require('../services/keyService.js');
+
 exports.refreshKeyValidator = [
   header('x-rest-api-refresh-key').custom(async (_, { req }) => {
 
-    const apiKey = req.get('x-rest-api-refresh-key');
+    const refreshKey = req.get('x-rest-api-refresh-key');
 
-    //check header exists
-    if (!Boolean(apiKey)) {
+    if (!refreshKey) {
       throw new Error('No x-rest-api-refresh-key header found in request.');
     }
 
-    // Validate UUID
-    if (!validator.isUUID(apiKey, 4)) {
-      throw new Error('x-rest-api-refresh-key provided is not in the expected format.');
-    }
+    const { userId, normalisedApiKey, normalisedRefreshKey } = await verifyRefreshKey(req.normalisedApiKey, refreshKey, req.path);
 
-    const result = await Token.findOne({ refreshToken: apiKey, expires: { $gt: new Date() }});
+    if (normalisedRefreshKey !== null) {
 
-    if (result !== null) {
+      req.userId = userId;
+      req.normalisedApiKey = normalisedApiKey;
+      req.normalisedRefreshKey = normalisedRefreshKey;
+
       return true;
+
     } else {
       throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
     }
+    
   })
 ];

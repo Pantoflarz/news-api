@@ -138,36 +138,40 @@ const setup = async () => {
     next();
   });
 
-  web.use(apiKeyValidator, validateRequest);
+	web.use(apiKeyValidator, validateRequest);
 
-  web.use(auth);
-  web.use(news);
-  web.use(ping);
-  web.use(track);
+	// Optional audit logger (wraps routes)
+	if (Config.apiConfig.audit) {
+	  web.use((req, res, next) => {
+	    res.on('finish', () => {
+	      Audit(req, res);
+	    });
+	    next();
+	  });
+	}
 
-  web.use(async function (req, res, next) {
-    if (!res.headersSent) {
-      res.status(501).send(responseJson("error", 'Invalid request, cannot ' + req.method + " " + req.url + " as either the method is invalid or endpoint does not exist."));
-    }
-    next();
-  });
+	// Route handlers
+	web.use(auth);
+	web.use(news);
+	web.use(ping);
+	web.use(track);
 
-  web.use(function (req, res, next) {
-    if (!Config.apiConfig.audit) return next();
-    if (res.headersSent) {
-      Audit(req, res);
-    }
-    next();
-  });
+	// 404 fallback
+	web.use((req, res, next) => {
+	  if (!res.headersSent) {
+	    res.status(404).send(
+	      responseJson("error", `Cannot ${req.method} ${req.url}.`)
+	    );
+	  }
+	});
 
-  web.use((err, req, res, next) => {
-    logger.error(err.stack);
-
-    if (!res.headersSent) {
-      res.status(500).send(responseJson("error", "Server error."));
-  }
-
-  });
+	// Error handler
+	web.use((err, req, res, next) => {
+	  logger.error(err.stack);
+	  if (!res.headersSent) {
+	    res.status(500).send(responseJson("error", "Server error."));
+	  }
+	});
 
   logger.debug('...started');
 

@@ -10,8 +10,6 @@ class NewsController {
 
     res.status(200).send(this.responseJson("OK", res.locals.cache.get("news")));
 
-    next();
-
   }
 }
 

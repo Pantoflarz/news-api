@@ -25,11 +25,9 @@ class TrackController {
         error: err.message,
         stack: err.stack
       });
+
+      res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
     }
-
-    res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
-
-    next();
 
   }
 }

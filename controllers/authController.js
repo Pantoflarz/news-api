@@ -19,25 +19,27 @@ class AuthController {
     let password = await this.bcrypt.hash(req.body.password, 10);
     let registeredDate = new Date();
 
-    const result = await User.findOne({ userEmail: useremail});
+    try {
 
-    if (result == null) {
-      try {
-        const insert = await User.create({userEmail: useremail, userName: username, password: password, registeredDate: registeredDate});
-        if (insert) {
-          res.status(200).send(this.responseJson("OK", "success"));
-        }
-      } catch (err) {
-        logger.error('Failed to create user', {
-          error: err.message,
-          stack: err.stack
-        });
+      const result = await User.findOne({ userEmail: useremail});
+
+      if (result) {
+        throw new Error('User already exists');
       }
+
+      const insert = await User.create({userEmail: useremail, userName: username, password: password, registeredDate: registeredDate});
+      if (insert) {
+        res.status(200).send(this.responseJson("OK", "success"));
+      }
+
+    } catch (err) {
+      logger.error('Failed to create user', {
+        error: err.message,
+        stack: err.stack
+      });
+
+      res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
     }
-
-    res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
-
-    next();
   }
 
 async login_post(req, res, next) {
@@ -70,12 +72,13 @@ async login_post(req, res, next) {
             stack: err.stack
           });
         }
+      } else {
+        res.status(403).send(this.responseJson("error", "Provided details invalid."));
       }
+    } else {
+      res.status(403).send(this.responseJson("error", "Provided details invalid."));
     }
 
-    res.status(403).send(this.responseJson("error", "Provided details invalid."));
-
-    next();
   }
 
 async refresh_key_post(req, res, next) {
@@ -85,7 +88,7 @@ async refresh_key_post(req, res, next) {
 
     let expires = new Date(Date.now() + 12 * (60 * 60 * 1000)).toISOString()
 
-    try{
+    try {
       const insert = await Token.insertOne({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
 
       if (insert) {
@@ -101,17 +104,15 @@ async refresh_key_post(req, res, next) {
       });
     }
 
-    next();
   }
 
 async logout_post(req, res, next) {
-    let token = req.apiKey;
+    let token = req.normalisedApiKey;
 
     await Token.deleteOne({token: token});
 
     res.status(200).send(this.responseJson("OK", "Logged out."));
 
-    next();
   }
 
 }
