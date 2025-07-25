@@ -37,7 +37,7 @@ exports.verifyRefreshKey = async (apiKey, refreshKey, reqPath) => {
   const { userId, normalisedApiKey, normalisedRefreshKey } = await this.verifyApiKey(apiKey, reqPath);
 
   if (normalisedRefreshKey !== refreshKey) {
-    throw new Error('Invalid/expired x-rest-api-key provided in request.');
+    throw new Error('Invalid/expired x-rest-refresh-key provided in request.');
   }
 
   return {

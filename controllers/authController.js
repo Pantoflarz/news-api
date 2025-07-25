@@ -9,6 +9,14 @@ const logger = getLogger('AuthController');
 class AuthController {
 
   constructor(bcrypt, responseJson) {
+    if (typeof bcrypt?.hash !== 'function') {
+      throw new TypeError('Expected bcrypt to be an object with a hash function');
+    }
+
+    if (typeof responseJson !== 'function') {
+      throw new TypeError('Expected responseJson to be a function');
+    }
+
     this.bcrypt = bcrypt;
     this.responseJson = responseJson;
   }
