@@ -12,7 +12,7 @@ async function Audit(req, res) {
       //actor - UserID
       //timestamp - timestamp
       //source - UA + IP
-      //metadata - query params
+      //metadata - api key and refresh key (if provided) (obfuscated)
     //response -
         //http_code - HTTP code
 
@@ -40,8 +40,15 @@ async function Audit(req, res) {
       path: req.path,
       actor: req.userId,
       timestamp: new Date(Date.now()),
-      source: ip,
-      metadata: req.query
+      source: ip
+    }
+
+    if (req.get('x-rest-api-key') != null) {
+      requestObj.metadata['x-rest-api-key'] = obfuscate(req.get('x-rest-api-key'));
+    }
+
+    if (req.get('x-rest-api-refresh-key') != null) {
+      requestObj.metadata['x-rest-api-refresh-key'] = obfuscate(req.get('x-rest-api-refresh-key'));
     }
 
     let responseObj = {
@@ -57,5 +64,10 @@ async function Audit(req, res) {
       helper.log("ACCESS", status, requestObj, responseObj);
     }
 }
+
+const obfuscate = (value, visibleChars = 6) => {
+  if (!value || typeof value !== 'string') return '***';
+  return `***${value.slice(-visibleChars)}`;
+};
 
 module.exports = Audit;

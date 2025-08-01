@@ -54,13 +54,14 @@ async login_post(req, res, next) {
     let login = req.body.login;
     let password = req.body.password;
 
-    const result = await User.findOne(
-    {
-      $or: [
-        {userEmail: login},
-        {userName: login}
-      ]
-    });
+    try {
+      const result = await User.findOne(
+      {
+        $or: [
+          {userEmail: login},
+          {userName: login}
+        ]
+      });
 
     if (result != null) {
       if (await this.bcrypt.compare(password, result.password)) {
@@ -68,22 +69,25 @@ async login_post(req, res, next) {
         let refreshToken = crypto.randomUUID();
         let expires = new Date(Date.now() + 12 * (24 * 60 * 1000));
 
-        try {
-          const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
+        const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
 
-          if (insert) {
-              res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
-          }
-        } catch (err) {
-          logger.error('Failed to create token for user', {
-            error: err.message,
-            stack: err.stack
-          });
+        if (insert) {
+            res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
         }
+
       } else {
-        res.status(403).send(this.responseJson("error", "Provided details invalid."));
+        throw new Error('Password does not match account.');
       }
     } else {
+      throw new Error('Account does not exist.');
+    }
+
+    } catch (err) {
+      logger.error('Failed to create token for user', {
+        error: err.message,
+        stack: err.stack
+      });
+
       res.status(403).send(this.responseJson("error", "Provided details invalid."));
     }
 
@@ -102,14 +106,15 @@ async refresh_key_post(req, res, next) {
       if (insert) {
           await Token.deleteOne({token: req.apiKey});
           res.status(200).send(this.responseJson("OK", {"token": newToken, "refreshToken": newRefreshToken}));
-      } else {
-          res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
       }
+
     } catch (err) {
       logger.error('Failed to refresh token for user', {
         error: err.message,
         stack: err.stack
       });
+
+      res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
     }
 
   }

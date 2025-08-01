@@ -7,4 +7,7 @@ const mockLoggerInstance = {
 
 const getLogger = jest.fn(() => mockLoggerInstance);
 
+// Export an object with getLogger as default and the mock attached
+getLogger.mockLoggerInstance = mockLoggerInstance;
+
 module.exports = getLogger;

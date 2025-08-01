@@ -1,7 +1,8 @@
-jest.mock('../../../utils/Logger.js', () => require('@mocks/mockLogger'));
+jest.mock('../../../utils/Logger.js');
 
 const getLogger = require('../../../utils/Logger.js');
-const mockLogger = getLogger();
+
+const mockLoggerInstance = getLogger();
 
 const AuthController = require('../../../controllers/authController.js');
 
@@ -43,7 +44,6 @@ describe('constructor tests', () => {
 });
 
 describe('register_post tests', () => {
-  let mockLogger;
   let controller;
   let mockBcrypt;
   let mockResponseJson;
@@ -52,7 +52,7 @@ describe('register_post tests', () => {
   let next;
 
   beforeEach(() => {
-    mockLogger = logger();
+    jest.clearAllMocks();
     mockBcrypt = { hash: jest.fn() };
     mockResponseJson = jest.fn((status, message) => ({ status, message }));
     controller = new AuthController(mockBcrypt, mockResponseJson);
@@ -97,7 +97,7 @@ describe('register_post tests', () => {
 
     await controller.register_post(req, res, next);
 
-    expect(mockLogger.error).toHaveBeenCalledWith(
+    expect(mockLoggerInstance.error).toHaveBeenCalledWith(
       'Failed to create user',
       expect.objectContaining({
         error: 'User already exists',
@@ -115,7 +115,7 @@ describe('register_post tests', () => {
 
     await controller.register_post(req, res, next);
 
-    expect(mockLogger.error).toHaveBeenCalledWith(
+    expect(mockLoggerInstance.error).toHaveBeenCalledWith(
       'Failed to create user',
       expect.objectContaining({
         error: 'DB failure',
