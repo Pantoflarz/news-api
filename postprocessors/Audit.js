@@ -40,7 +40,8 @@ async function Audit(req, res) {
       path: req.path,
       actor: req.userId,
       timestamp: new Date(Date.now()),
-      source: ip
+      source: ip,
+      metadata: {}
     }
 
     if (req.get('x-rest-api-key') != null) {

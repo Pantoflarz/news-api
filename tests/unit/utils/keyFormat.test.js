@@ -1,4 +1,4 @@
-const { isKeyInValidFormat } = require('../../utils/keyFormat.js');
+const { isKeyInValidFormat } = require('../../../utils/keyFormat.js');
 
 describe('isKeyInValidFormat', () => {
   test('returns true for valid UUIDv4 string', () => {

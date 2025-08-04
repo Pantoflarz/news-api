@@ -1,8 +1,8 @@
-const { verifyApiKey, verifyRefreshKey } = require('../../services/keyService.js');
-const Token = require('../../models/Token.js');
+const { verifyApiKey, verifyRefreshKey } = require('../../../services/keyService.js');
+const Token = require('../../../models/Token.js');
 
-jest.mock('../../models/Token.js');
-jest.mock('../../settings/configs/ConfigLoader.js', () => ({
+jest.mock('../../../models/Token.js');
+jest.mock('../../../settings/configs/ConfigLoader.js', () => ({
   get scopesConfig() {
     return {
       basic: ['/path-a']
@@ -39,10 +39,15 @@ describe('keyServiceTest', () => {
       await expect(verifyApiKey('c9bf9e57-1685-4c89-bafb-ff5af830be8a', '/path-a'))
         .rejects.toThrow('Invalid/expired x-rest-api-key provided in request.');
     });
+
+    test('throws if api key format is invalid', async () => {
+      await expect(verifyApiKey('invalid-key', '/path-a'))
+        .rejects.toThrow('x-rest-api-key provided is not in the expected format.');
+    });
   });
 
   describe('verifyRefreshKey', () => {
-    test('returns user info for matching refresh key and allowed path', async () => {
+    test('returns user info for matching refresh key and api key', async () => {
       const mockToken = {
         userId: '123',
         scope: 'basic',
@@ -51,23 +56,55 @@ describe('keyServiceTest', () => {
       };
       Token.findOne.mockResolvedValue(mockToken);
 
-      const { userId, normalisedApiKey, normalisedRefreshKey } = await verifyRefreshKey('c9bf9e57-1685-4c89-bafb-ff5af830be8a', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', '/path-a');
+      const { userId, normalisedApiKey, normalisedRefreshKey } = await verifyRefreshKey(
+        'c9bf9e57-1685-4c89-bafb-ff5af830be8a',
+        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        '/path-a'
+      );
 
       expect(userId).toEqual(mockToken.userId);
       expect(normalisedApiKey).toEqual(mockToken.token);
       expect(normalisedRefreshKey).toEqual(mockToken.refreshToken);
     });
-    test('fails to return user info for non-matching refresh key', async () => {
+
+    test('throws if refresh key is not in valid format', async () => {
+      await expect(
+        verifyRefreshKey(
+          'c9bf9e57-1685-4c89-bafb-ff5af830be8a',
+          'bad-key-format',
+          '/path-a'
+        )
+      ).rejects.toThrow('x-rest-api-refresh-key provided is not in the expected format.');
+    });
+
+    test('throws if refresh token is not found or expired', async () => {
+      Token.findOne.mockResolvedValue(null);
+
+      await expect(
+        verifyRefreshKey(
+          'c9bf9e57-1685-4c89-bafb-ff5af830be8a',
+          'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+          '/path-a'
+        )
+      ).rejects.toThrow('Invalid/expired x-rest-api-refresh-key provided in request.');
+    });
+
+    test('throws if token associated with refresh key does not match provided api key', async () => {
       const mockToken = {
         userId: '123',
         scope: 'basic',
-        token: 'c9bf9e57-1685-4c89-bafb-ff5af830be8a',
+        token: 'different-api-key', // mismatched
         refreshToken: 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
       };
       Token.findOne.mockResolvedValue(mockToken);
 
-      await expect(verifyRefreshKey('c9bf9e57-1685-4c89-bafb-ff5af830be8a', '3fa85f64-5717-4562-b3fc-2c963f66afa6', '/path-a'))
-        .rejects.toThrow('Invalid/expired x-rest-refresh-key provided in request.');
+      await expect(
+        verifyRefreshKey(
+          'c9bf9e57-1685-4c89-bafb-ff5af830be8a', // apiKey passed
+          'f47ac10b-58cc-4372-a567-0e02b2c3d479', // refreshKey passed
+          '/path-a'
+        )
+      ).rejects.toThrow('Invalid/expired x-rest-api-refresh-key provided in request.');
     });
   });
 });

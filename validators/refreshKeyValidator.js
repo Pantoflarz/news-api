@@ -17,17 +17,11 @@ exports.refreshKeyValidator = [
 
     const { userId, normalisedApiKey, normalisedRefreshKey } = await verifyRefreshKey(req.normalisedApiKey, refreshKey, req.path);
 
-    if (normalisedRefreshKey !== null) {
+    req.userId = userId;
+    req.normalisedApiKey = normalisedApiKey;
+    req.normalisedRefreshKey = normalisedRefreshKey;
 
-      req.userId = userId;
-      req.normalisedApiKey = normalisedApiKey;
-      req.normalisedRefreshKey = normalisedRefreshKey;
+    return true;
 
-      return true;
-
-    } else {
-      throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
-    }
-    
   })
 ];

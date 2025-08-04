@@ -1,6 +1,6 @@
 const request = require("supertest");
 
-describe("POST /auth/register", () => {
+describe("Integration | POST /auth/register", () => {
 
   const app = global.__APP__;
 

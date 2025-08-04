@@ -34,15 +34,18 @@ exports.verifyRefreshKey = async (apiKey, refreshKey, reqPath) => {
     throw new Error('x-rest-api-refresh-key provided is not in the expected format.');
   }
 
-  const { userId, normalisedApiKey, normalisedRefreshKey } = await this.verifyApiKey(apiKey, reqPath);
+  const result = await Token.findOne({
+    refreshToken: refreshKey,
+    expires: { $gt: new Date() }
+  });
 
-  if (normalisedRefreshKey !== refreshKey) {
-    throw new Error('Invalid/expired x-rest-refresh-key provided in request.');
+  if (!result || result.token !== apiKey) {
+    throw new Error('Invalid/expired x-rest-api-refresh-key provided in request.');
   }
 
   return {
-    userId: userId,
-    normalisedApiKey: normalisedApiKey,
-    normalisedRefreshKey: normalisedRefreshKey
+    userId: result.userId,
+    normalisedApiKey: result.token,
+    normalisedRefreshKey: result.refreshToken
   };
 };
