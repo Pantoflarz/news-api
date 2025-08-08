@@ -4,4 +4,4 @@ async function getDateFormat() {
   return dateFormat;
 }
 
-module.exports = getDateFormat;
+module.exports = { getDateFormat };

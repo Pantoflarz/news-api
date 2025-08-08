@@ -1,5 +1,3 @@
-const asyncHandler = require("express-async-handler");
-
 class PingController {
 
   constructor(responseJson) {

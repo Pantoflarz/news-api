@@ -59,7 +59,7 @@ async function Audit(req, res) {
     const eventType = req.path.includes('/auth') ? 'AUTHENTICATION' : 'ACCESS';
     await helper.log(eventType, status, requestObj, responseObj);
   } catch (error) {
-    // Optionally log or rethrow error if you want to track Audit failures
+    // Optionally log or rethrow error to track Audit failures
     logger.error('📋 Audit logging failed: ', error);
   }
 }

@@ -1,5 +1,3 @@
-const asyncHandler = require("express-async-handler");
-
 class NewsController {
 
   constructor(responseJson) {
@@ -7,9 +5,13 @@ class NewsController {
   }
 
   async dashboard_get(req, res, next) {
+    const news = res.locals.cache.get("news");
 
-    res.status(200).send(this.responseJson("OK", res.locals.cache.get("news")));
+    if (!news) {
+      return res.status(404).send(this.responseJson("error", "News not found"));
+    }
 
+    res.status(200).send(this.responseJson("OK", news));
   }
 }
 

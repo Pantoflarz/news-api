@@ -1,5 +1,3 @@
-const asyncHandler = require("express-async-handler");
-
 const Track = require('../models/Track.js');
 
 const getLogger = require('../utils/Logger.js');
@@ -19,6 +17,8 @@ class TrackController {
       const insert = await Track.insertOne({userId: req.userId, article: articleID, time: new Date(Date.now())});
       if (insert) {
           res.status(200).send(this.responseJson("OK", "success"));
+      } else {
+        throw new Error('Could not insert tracked article');
       }
     } catch (err) {
       logger.error('Failed to track article read by user', {

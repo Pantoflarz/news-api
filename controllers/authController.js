@@ -1,4 +1,4 @@
-const asyncHandler = require("express-async-handler");
+const crypto = require('crypto');
 
 const User = require("../models/User.js");
 const Token = require('../models/Token.js');
@@ -38,6 +38,8 @@ class AuthController {
       const insert = await User.create({userEmail: useremail, userName: username, password: password, registeredDate: registeredDate});
       if (insert) {
         res.status(200).send(this.responseJson("OK", "success"));
+      } else {
+        throw new Error('Failed to insert new user');
       }
 
     } catch (err) {
@@ -67,19 +69,21 @@ async login_post(req, res, next) {
       if (await this.bcrypt.compare(password, result.password)) {
         let token = crypto.randomUUID();
         let refreshToken = crypto.randomUUID();
-        let expires = new Date(Date.now() + 12 * (24 * 60 * 1000));
+        let expires = new Date(Date.now() + 4 * (60 * 60 * 1000));
 
-        const insert = await Token.insertOne({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
+        const insert = await Token.create({userId: result._id, scope: "basic", token: token, refreshToken: refreshToken, expires: expires });
 
         if (insert) {
             res.status(200).send(this.responseJson("OK", {"token": token, "refreshToken": refreshToken}));
+        } else {
+          throw new Error('Failed to login user');
         }
 
       } else {
-        throw new Error('Password does not match account.');
+        throw new Error('Password does not match account');
       }
     } else {
-      throw new Error('Account does not exist.');
+      throw new Error('Account does not exist');
     }
 
     } catch (err) {
@@ -98,14 +102,16 @@ async refresh_key_post(req, res, next) {
     let newToken = crypto.randomUUID();
     let newRefreshToken = crypto.randomUUID();
 
-    let expires = new Date(Date.now() + 12 * (60 * 60 * 1000)).toISOString()
+    let expires = new Date(Date.now() + 4 * (60 * 60 * 1000));
 
     try {
-      const insert = await Token.insertOne({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
+      const insert = await Token.create({userId: req.userId, scope: "basic", token: newToken, refreshToken: newRefreshToken, expires: expires });
 
       if (insert) {
           await Token.deleteOne({token: req.apiKey});
           res.status(200).send(this.responseJson("OK", {"token": newToken, "refreshToken": newRefreshToken}));
+      } else {
+        throw new Error('Failed to refresh key');
       }
 
     } catch (err) {
@@ -120,12 +126,20 @@ async refresh_key_post(req, res, next) {
   }
 
 async logout_post(req, res, next) {
-    let token = req.normalisedApiKey;
 
-    await Token.deleteOne({token: token});
+  let token = req.normalisedApiKey;
 
+  try {
+    const result = await Token.deleteOne({ token });
     res.status(200).send(this.responseJson("OK", "Logged out."));
+  } catch (err) {
+    logger.error('Failed to delete token on logout', {
+      error: err.message,
+      stack: err.stack
+    });
 
+    res.status(500).send(this.responseJson("error", "Something went wrong. Try again later."));
+    }
   }
 
 }

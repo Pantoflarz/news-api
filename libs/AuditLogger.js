@@ -29,11 +29,6 @@ class AuditLogger {
       this.#logger.end();
     }
 
-    async #getFormattedDate() {
-      const dateFormat = await dateFormatPromise;
-      return dateFormat(new Date(), 'dd-mm-yyyy');
-    }
-
 }
 
 module.exports = AuditLogger;
