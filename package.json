@@ -4,6 +4,8 @@
   "main": "api.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=jest.config.cjs --detectOpenHandles --testTimeout=5000",
+    "test:unit": "npm test -- --selectProjects unit",
+    "test:e2e": "npm test -- --selectProjects e2e",
     "start": "node bin/start.js"
   },
   "keywords": [],

@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = async () => {
   console.log('🚀 Global setup starting...');
 
-  const appPromise = require(path.join(__dirname, '../../api.js'));
+  const appPromise = require(path.join(__dirname, '../../../api.js'));
   const app = await appPromise;
 
   if (!app) {
