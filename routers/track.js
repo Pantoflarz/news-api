@@ -4,7 +4,7 @@ const responseJson = require('../libs/Response.js');
 
 const TrackController = require("../controllers/trackController.js");
 
-const { trackPostValidation } = require('../validators/trackValidator.js');
+const { trackValidator } = require('../validators/trackValidator.js');
 const validateRequest = require('../middleware/validateRequest.js');
 
 const track = express.Router();
@@ -19,6 +19,6 @@ const trackController = new TrackController(responseJson);
  * @returns {200} { "status": "OK", "response": "success" }
  * @returns {500} { "status": "error", "response": "Something went wrong. Try again later." }
  */
-track.post('/track', trackPostValidation, validateRequest, asyncHandler(trackController.track_post.bind(trackController)));
+track.post('/track', trackValidator, validateRequest, asyncHandler(trackController.track_post.bind(trackController)));
 
 module.exports = track;

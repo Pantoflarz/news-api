@@ -2,22 +2,18 @@ const { body } = require('express-validator');
 
 const Article = require('../models/Article.js');
 
-exports.trackPostValidation = [
+exports.trackValidator = [
   body('articleID')
-  .trim()
-  .toLowerCase()
-  .notEmpty().withMessage('articleID is required')
-  .escape()
-  .custom(async (value, { req }) => {
-
-    if (value !== undefined) {
-        const result = await Article.findOne({ _id: value});
-        if (result != null) {
-          return true;
-        } else {
-          throw new Error('Invalid articleID provided in request.');
+    .exists({ checkFalsy: true }).withMessage('articleID is required')
+    .bail()
+    .trim()
+    .toLowerCase()
+    .escape()
+    .custom(async (value) => {
+      const result = await Article.findOne({ _id: value });
+      if (!result) {
+        throw new Error('Invalid articleID provided in request.');
       }
-    }
-
-  }),
+      return true;
+    })
 ];
