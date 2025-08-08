@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const AuditLogger = require('../libs/AuditLogger');
+const AuditLogger = require('../libs/AuditLogger.js');
 
 const getClientIp = require('../utils/getClientIp.js');
 

@@ -22,7 +22,13 @@ async function connect(config, options = {}) {
   }
 }
 
+//test helper to reset isConnected for test isolation and mock purposes
+function __setIsConnected(value) {
+  isConnected = value;
+}
+
 module.exports = {
   connect,
-  mongoose
+  mongoose,
+  __setIsConnected,
 };

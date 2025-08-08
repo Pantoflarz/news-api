@@ -19,7 +19,7 @@ Run the tests using `npm test`.
 
 ## Coming Soon
 * Finish all js docs.
-* Unit tests.
-* Tests for all existing endpoints.
+* Unit tests for controllers.
+* e2e tests for all existing endpoints.
 * Recommendation algorithm to personalise returned news for a given account.
 * Code tidy-ups (logging to include all try catch blocks, mongodb query validation).

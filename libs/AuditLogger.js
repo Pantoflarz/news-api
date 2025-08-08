@@ -1,5 +1,4 @@
-let dateFormatPromise = import('dateformat').then(m => m.default);
-
+const { getDateFormat } = require('./dateFormatWrapper.js');
 const fs = require('fs');
 
 class AuditLogger {
@@ -11,7 +10,8 @@ class AuditLogger {
     }
 
     async init() {
-      const date = await this.#getFormattedDate();
+      const dateFormat = await getDateFormat();
+      const date = dateFormat(new Date(), 'dd-mm-yyyy');
       this.#logger = fs.createWriteStream('logs/audit/audit-log-' + date + '.txt', {
           flags: 'a'
       });
