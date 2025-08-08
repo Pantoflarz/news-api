@@ -15,11 +15,13 @@ See the `.env.example` file for an example secrets config. Fill it in/amend it a
 Install using `npm ci ./path/to/news-api`.
 
 Run using `npm start`.
-Run the tests using `npm test`.
+Run the unit tests using `npm test:unit`.
+Run the unit tests using `npm test:e2e` - this spins up the app to run against.
 
 ## Coming Soon
 * Finish all js docs.
-* Unit tests for controllers.
 * e2e tests for all existing endpoints.
+* Make e2e tests run against a separate db, so that they don't interfere with prod data.
+* Have some mechanism where the e2e tests can clean up the db after themselves after they have ran.
 * Recommendation algorithm to personalise returned news for a given account.
-* Code tidy-ups (logging to include all try catch blocks, mongodb query validation).
+* Code tidy-ups.
