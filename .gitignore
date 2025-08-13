@@ -18,4 +18,5 @@ build/
 npm-debug.log
 .idea/
 .env
+.env.test
 .DS_Store

@@ -4,7 +4,7 @@ module.exports = {
     {
       displayName: "unit",
       testEnvironment: "node",
-      testMatch: ["<rootDir>/tests/unit/**/*.test.js"],
+      testMatch: ["<rootDir>/tests/unit/**/*.test.js"]
     },
 
     // E2E tests
@@ -13,7 +13,7 @@ module.exports = {
       testEnvironment: "node",
       testMatch: ["<rootDir>/tests/e2e/**/*.test.js"],
       globalSetup: "<rootDir>/tests/e2e/setup/globalSetup.js",
-      globalTeardown: "<rootDir>/tests/e2e/setup/globalTeardown.js",
+      globalTeardown: "<rootDir>/tests/e2e/setup/globalTeardown.js"
     }
   ]
 };

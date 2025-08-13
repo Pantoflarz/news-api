@@ -1,4 +1,9 @@
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+
+const dotenvExpanded = require('dotenv-expand');
+dotenvExpanded.expand(dotenv.config({ path: envFile }));
 
 const https = require('https');
 const express = require('express');
@@ -91,6 +96,7 @@ const setup = async () => {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+		dbCluster: process.env.DB_CLUSTER,
     dbName: process.env.DB_NAME
   });
   //await downloadNews();

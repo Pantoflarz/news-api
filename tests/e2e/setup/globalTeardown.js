@@ -1,9 +1,14 @@
-module.exports = async () => {
-  console.log('🧹 Global teardown running...');
+const teardownDb = require('../../../bootstrap/teardownDb.js');
+const getLogger = require('../../../utils/Logger.js');
+const logger = getLogger('Jest globalTeardown');
 
-  // For example, if using Mongoose:
+module.exports = async function globalTeardown() {
+  logger.info('🧹 Jest global teardown starting...');
+
+  await teardownDb();
+
   const mongoose = require('mongoose');
   await mongoose.connection.close();
 
-  console.log('✅ Global teardown complete.');
+  logger.info('✅ Jest global teardown complete');
 };

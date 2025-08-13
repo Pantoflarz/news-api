@@ -11,12 +11,17 @@ An example News API that handles basic authentication, account management, news 
 ## Usage
 See the `settings/configs/RestAPI.example.json` file for an example application config. Fill it in/amend it and rename it to RestAPI.json to use it.
 See the `.env.example` file for an example secrets config. Fill it in/amend it and rename it to .env to use it.
+For running tests, see the `.env.example` file for an example secrets config. Fill it in/amend it and rename it to .env.test to use it.
+
+The app is capable of bootstrapping its own DB structure. Use the relevant env files to set RUN_BOOTSTRAP=true to enable bootstrap mode.
+In production, if enabled, this will check that the collections exist; if they do not, they are created with the right structure (note that structure of the existing collection if present is not currently validated).
+In test, if enabled, this will delete the collections and create them with the right structure; it is highly advised therefore that you do not set the test env to point to the same db as your production, as this will lead to data loss.
 
 Install using `npm ci ./path/to/news-api`.
 
 Run using `npm start`.
-Run the unit tests using `npm test:unit`.
-Run the unit tests using `npm test:e2e` - this spins up the app to run against.
+Run the unit tests using `npm run test:unit`.
+Run the unit tests using `npm run test:e2e` - this spins up the app to run against.
 
 ## Coming Soon
 * Finish all js docs.

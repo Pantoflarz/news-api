@@ -27,7 +27,8 @@ describe('MongoDB connect()', () => {
     user: 'testUser',
     password: 'testPass',
     host: 'testhost.mongodb.net',
-    dbName: 'testDb',
+    dbCluster: 'testCluster',
+    dbName: 'testDb'
   };
 
   test('should connect successfully and log info', async () => {
@@ -36,7 +37,7 @@ describe('MongoDB connect()', () => {
     const result = await mongoModule.connect(config);
 
     expect(mongoose.connect).toHaveBeenCalledWith(
-      expect.stringContaining(`mongodb+srv://${config.user}:${config.password}@${config.host}/app`),
+      expect.stringContaining(`mongodb+srv://${config.user}:${config.password}@${config.host}/${config.dbName}?retryWrites=true&w=majority&appName=${config.dbCluster}`),
       expect.any(Object)
     );
 

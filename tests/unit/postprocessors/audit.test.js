@@ -3,7 +3,7 @@ const AuditLogger = require('../../../libs/AuditLogger.js');
 
 jest.mock('../../../libs/AuditLogger.js');
 jest.mock('../../../utils/getClientIp.js');  // will use jest.fn() automatically
-jest.mock('../../../utils/Logger.js');       // uses your manual mock in __mocks__/Logger.js
+jest.mock('../../../utils/Logger.js');       // uses the manual mock in __mocks__/Logger.js
 
 const getClientIp = require('../../../utils/getClientIp.js');
 const getLogger = require('../../../utils/Logger.js');
