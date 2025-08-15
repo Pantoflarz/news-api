@@ -29,8 +29,8 @@ describe('validateRequest', () => {
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({
-      success: false,
-      errors: fakeErrors
+      status: "error",
+      response: fakeErrors
     });
     expect(next).not.toHaveBeenCalled();
   });
@@ -62,7 +62,7 @@ describe('validateRequest', () => {
 
     // check the exact errors array passed in JSON response
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-      errors: fakeErrors
+      response: fakeErrors
     }));
   });
 });

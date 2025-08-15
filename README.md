@@ -14,19 +14,17 @@ See the `.env.example` file for an example secrets config. Fill it in/amend it a
 For running tests, see the `.env.example` file for an example secrets config. Fill it in/amend it and rename it to .env.test to use it.
 
 The app is capable of bootstrapping its own DB structure. Use the relevant env files to set RUN_BOOTSTRAP=true to enable bootstrap mode.
-In production, if enabled, this will check that the collections exist; if they do not, they are created with the right structure (note that structure of the existing collection if present is not currently validated).
+In production, if enabled, this will check that the collections exist; if they do not, they are created with the right structure (note that structure of the existing collections if present is not currently validated).
 In test, if enabled, this will delete the collections and create them with the right structure; it is highly advised therefore that you do not set the test env to point to the same db as your production, as this will lead to data loss.
 
 Install using `npm ci ./path/to/news-api`.
 
 Run using `npm start`.
 Run the unit tests using `npm run test:unit`.
-Run the unit tests using `npm run test:e2e` - this spins up the app to run against.
+Run the e2e tests using `npm run test:e2e` - this spins up the app to run against.
 
 ## Coming Soon
+* Apply rate limiter and test it works.
 * Finish all js docs.
 * e2e tests for all existing endpoints.
-* Make e2e tests run against a separate db, so that they don't interfere with prod data.
-* Have some mechanism where the e2e tests can clean up the db after themselves after they have ran.
 * Recommendation algorithm to personalise returned news for a given account.
-* Code tidy-ups.
